@@ -1,0 +1,62 @@
+#!/bin/python3
+import argparse
+from sys import stdin
+from requests import get
+
+histogram = {}
+vocals = 'aeiouAEIOU'
+
+def isVocal(c):
+    if not c in vocals:
+        return False    
+    return True    
+
+def main():
+    RES_HIST = 50
+
+    parser = argparse.ArgumentParser()
+    parser.add_argument("-s")
+    parser.add_argument("url", type=str, nargs=1)
+    args = parser.parse_args()
+
+    if args.s:
+        RES_HIST = int(args.s)
+
+    # recieve html data from url
+    try:
+        resp = get(args.url[0])
+    except Exception as e:
+        print("Error: {}, try different url".format(e))
+        return
+
+    # collect data
+    sum = 0
+    for ascii_int in resp.content:
+        if isVocal(chr(ascii_int)):
+            sum = sum + 1
+            # convert to lower case
+            if ascii_int < 97:
+                ascii_int = ascii_int + 32
+
+            if ascii_int in histogram:
+                histogram[ascii_int] = histogram[ascii_int] + 1
+            else:
+                histogram[ascii_int] = 1
+    
+    # represent data
+    
+    maxValue = histogram[max(histogram, key=histogram.get)]
+    print("Processing... {0} vocals with a maximum value of: {1}".format(sum, maxValue))
+
+    for c in vocals[0:5]:
+        n = ord(c)
+        if not n in histogram:
+            histogram[n] = 0
+
+        nAst = int(RES_HIST * (histogram[n]/maxValue))
+        bar =  nAst * "*"
+        print("{0}\t{1}\t{2}".format(c, histogram[n], bar))
+        
+
+if __name__ == "__main__":
+    main()

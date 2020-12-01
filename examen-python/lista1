@@ -1,0 +1,24 @@
+#!/bin/python3
+
+# argparse sigue la linea de optparse, el cual está obsoleto desde la version 3.2
+import argparse
+
+def main():
+    params = ["-a", "-b", "-c", "-d", "-e", "-f", "-r"]
+
+    parser = argparse.ArgumentParser()
+    comm_group = parser.add_argument_group(title="comm_list")
+    
+    for p in params:
+        comm_group.add_argument(p)
+
+    args = parser.parse_args()
+
+    argsDir = args.__dict__
+    for k in argsDir:
+        if argsDir[k]:
+            print("{0}-->{1}, lengths: {2}, {3}".format(k, argsDir[k], len(k), len(argsDir[k])))
+
+
+if __name__ == "__main__":
+    main()

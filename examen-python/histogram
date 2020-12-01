@@ -1,0 +1,39 @@
+#!/bin/python3
+import argparse
+from sh import gnuplot
+from sys import stdin
+
+histogram = {}
+
+def main():
+    RES_HIST = 50
+
+    parser = argparse.ArgumentParser()
+    parser.add_argument("-s")
+    args = parser.parse_args()
+
+    if args.s:
+        RES_HIST = int(args.s)
+
+    sum = 0
+    for line in stdin:
+        n = int(line)
+        if n in histogram:
+            histogram[n] = histogram[n] + 1
+        else:
+            histogram[n] = 1
+        sum = sum + 1
+    
+    maxValue = histogram[max(histogram, key=histogram.get)]
+    print("Processing... {0} items with a maximum value of: {1}".format(sum, maxValue))
+    for n in range(max(histogram)):
+        if not n in histogram:
+            histogram[n] = 0
+
+        nAst = int(RES_HIST * (histogram[n]/maxValue))
+        bar =  nAst * "*"
+        print("{0}\t{1}\t{2}".format(n, histogram[n], bar))
+        
+
+if __name__ == "__main__":
+    main()
